@@ -23,6 +23,13 @@ class RWLock:
             redis_conn, f'lock:no_writers:{name}', expire=expire, auto_renewal=auto_renew)
         self.__readers_queue = redis_lock.Lock(
             redis_conn, f'lock:readers_queue:{name}', expire=expire, auto_renewal=auto_renew)
+    
+    def __enter__(self):
+        self.acquire()
+        return self
+    
+    def __exit__(self, type, value, traceback):
+        self.release()
 
     def __reader_acquire(self):
         self.__readers_queue.acquire()
